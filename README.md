@@ -1,3 +1,3 @@
 # Bookobot
-Book recomendation Telegram bot
+Book recomendation 
 Telegram bot
