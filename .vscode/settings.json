@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "books",
+            "database": "${workspaceFolder:BookoBot}/books.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true,
+    "python.formatting.provider": "black"
+}
