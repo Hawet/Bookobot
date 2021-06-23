@@ -26,7 +26,7 @@ def search_title(title):
     Searching title, returns dataframe
     """
     return pd.read_sql(
-                        'select title, book_ from books'+'\n'+
+                        'select title, book_id from books'+'\n'+
 
                         f'where lower(replace(title,\' \',\'\')) like lower(replace(\'%%{title}%%\',\' \',\'\')) limit 10',
                         engine)
@@ -51,3 +51,12 @@ def add_book(book_id,user_id):
     
 def get_user_id(username):
     return pd.read_sql(f'select user_id from users where username = \'{username}\'',engine).iloc[0,0]
+
+
+
+def add_into_not_interested(book_id,user_id):
+    engine.execute(
+        'insert into not_interested '+
+        f'values ({user_id}, {book_id}); '+
+        'commit;'
+    )
