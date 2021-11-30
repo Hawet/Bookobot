@@ -11,8 +11,6 @@ from aiogram.types import ReplyKeyboardRemove, \
     InlineKeyboardMarkup, InlineKeyboardButton, user
 
 
-
-
 API_TOKEN = TOKEN
 
 # Configure logging
