@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy.exc import IntegrityError
 engine = sqlalchemy.create_engine('postgresql://postgres:123@localhost/books')
 import pandas as pd
-
+import numpy as np
 
 
 
