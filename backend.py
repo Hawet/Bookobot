@@ -35,28 +35,51 @@ def search_title(title):
 
 def format_df(df):
     import tabulate
-    df = tabulate.tabulate(df)
-    return df
+    from prettytable import PrettyTable
+    table = PrettyTable([''] + list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row)
+    return str(table)
+
 
 
 
 def get_book_id(title):
+    """
+    get book id by title
+    """
     return pd.read_sql(f'select book_id from books where title = \'{title}\'',engine).iloc[0,0]
 
 
 def add_book(book_id,user_id):
+    '''
+    Adding book for user with rating 5
+    '''
     engine.execute(
         f'insert into ratings values({book_id},{user_id},5)'
     )
     
 def get_user_id(username):
+    """
+    get user id by username
+    """
     return pd.read_sql(f'select user_id from users where username = \'{username}\'',engine).iloc[0,0]
 
 
 
 def add_into_not_interested(book_id,user_id):
+    """
+    Adding book to not_interested list for given user
+    """
     engine.execute(
         'insert into not_interested '+
-        f'values ({user_id}, {book_id}); '+
+        f'values ({book_id}, {user_id}); '+
         'commit;'
     )
+
+
+def get_book_name(book_id):
+    """
+    Get book name by book_id
+    """
+    return pd.read_sql(f'select original_title from public.books where book_id = {book_id}',engine).iloc[0,0]

@@ -57,11 +57,13 @@ async def process_callback_add(callback_query: types.CallbackQuery):
         callback_query.data.split(',')[0],
         get_user_id(callback_query.from_user.username)
     )
-    await bot.send_message(callback_query.from_user.id,f'Book {callback_query.data.split()[0]} successfully added!')
+    name = get_book_name(callback_query.data.split(',')[0])
+    await bot.send_message(callback_query.from_user.id,f'Book {name} successfully added!')
 
 
 @dp.message_handler(commands=['get_recommendation'])
 async def process_get_recommendation(message: types.message):
+    await bot.send_message(message.from_user.id,'Compiling personal recommendations...')
     titles = recommend(get_user_id(message.from_user.username))
 
     get_rec_kb = InlineKeyboardMarkup(row_width=5)
@@ -69,7 +71,7 @@ async def process_get_recommendation(message: types.message):
     for book_id,index in zip(titles['book_id'],titles.index):
         get_rec_kb.insert(InlineKeyboardButton(index,callback_data=str(book_id)+',get_rec'))
     await bot.send_message(message.from_user.id,
-    format_df(titles),parse_mode='html',reply_markup=get_rec_kb)
+    format_df(titles['title'].to_frame()),parse_mode='html',reply_markup=get_rec_kb)
 
 
 
@@ -77,16 +79,25 @@ async def process_get_recommendation(message: types.message):
 async def process_callback_get_rec(callback_query: types.CallbackQuery):
 
     add_into_not_interested(
-        get_user_id(callback_query.from_user.username),
-        callback_query.data.split(',')[0]
+        callback_query.data.split(',')[0],
+        get_user_id(callback_query.from_user.username)
     )
+    name = get_book_name(callback_query.data.split(',')[0])
     await bot.send_message(callback_query.from_user.id,
-                            f'Book {callback_query.data.split()[0]} successfully added into not_interested!'
+                            f'Book {name} successfully added into not_interested!'
                             )
 
 
 
-
+@dp.message_handler(commands=['help'])
+async def process_help(message: types.Message):
+    await bot.send_message(message.from_user.id,
+    'Commands: \n'+
+    '/start - start bot \n'+
+    '/add - add book \n'+
+    '/get_recommendation - get recommendation \n'+
+    '/help - show this help'
+    )
 
 
 
