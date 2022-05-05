@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import sqlalchemy
 
@@ -86,9 +87,36 @@ def recommend(user_id):
 
 
 def recommend_single_book(user_id):
-    return recommend(user_id).iloc[0]
+    """
+    Getting siingle book from recommendation table, if exists
+    """
+    rec = pd.read_sql(f'select * from recommendations where user_id = {user_id}',engine)
+    if rec.empty:
+        return None
+    else:
+        return rec.iloc[0]
+
+def construct_recommendation_table():
+    users = pd.read_sql('select user_id from users', engine)['user_id'].tolist()
+    res_df = pd.DataFrame(columns=['user_id', 'book_id'])
+    for user in users:
+        print('constructing recommendation for user: ', user)
+        rec_df = recommend(user)
+        rec_df['user_id'] = user
+        res_df = res_df.append(rec_df)
+    res_df.to_sql('recommendations', engine, if_exists='replace', index=False)
+
+def delete_from_recommendation(book_id,user_id):
+    engine.execute(
+        f'delete from recommendations where user_id = {user_id} and book_id = {book_id}; commit;'
+    )
+    print(f'deleted {book_id} from {user_id}')
 
 
 if __name__=='__main__':
-    print(recommend(100065))
+    #print(recommend(100065))
+    # testing deletion and recommendation
     print(recommend_single_book(100065))
+    delete_from_recommendation(100065,890)
+    print(recommend_single_book(100065))
+    #print(construct_recommendation_table())

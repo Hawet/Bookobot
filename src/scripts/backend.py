@@ -1,9 +1,12 @@
+import imp
 import sqlalchemy
 from sqlalchemy.exc import IntegrityError
 engine = sqlalchemy.create_engine('postgresql://postgres:123@localhost/books')
 import pandas as pd
 import numpy as np
-
+from PIL import Image
+import requests
+import io
 
 
 
@@ -63,7 +66,8 @@ def get_user_id(username):
     """
     get user id by username
     """
-    return pd.read_sql(f'select user_id from users where username = \'{username}\'',engine).iloc[0,0]
+    print(f'select user_id from users where username = \'{username}\'')
+    return pd.read_sql(f'select user_id from users where username = \'{username}\'',engine).iloc[0][0]
 
 
 
@@ -78,8 +82,36 @@ def add_into_not_interested(book_id,user_id):
     )
 
 
+def add_into_to_read(book_id,user_id):
+    """
+    Adding book to to_read list for given user
+    """
+    engine.execute(
+        'insert into to_read '+
+        f'values ({user_id}, {book_id}); '+
+        'commit;'
+    )
+
 def get_book_name(book_id):
     """
     Get book name by book_id
     """
     return pd.read_sql(f'select original_title from public.books where book_id = {book_id}',engine).iloc[0,0]
+
+
+def get_book_cover(book_id):
+    """
+    Get book cover by book_id
+    """
+    url = pd.read_sql(f'select image_url from public.books where book_id = {book_id}',engine)['image_url'].iloc[0]
+    img = Image.open(requests.get(url, stream=True).raw)
+    # saving image to buffer
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+
+    #img.show()
+    return buffer.getbuffer()
+
+
+if __name__ == '__main__':
+    print(get_book_cover(890))

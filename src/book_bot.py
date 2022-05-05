@@ -1,6 +1,7 @@
+from email import message
 import logging
-from recommendation.recomendation import recommend
-
+from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation
+from recommendation.binder_states import BinderStates
 from numpy import add, tile
 from TOKEN import TOKEN
 from aiogram import Bot, Dispatcher, executor, types
@@ -102,10 +103,49 @@ async def process_help(message: types.Message):
 
 
 
+@dp.message_handler(commands=['binder'])
+async def process_binder(message: types.Message):
+    """
+    This function is used to get the binder functionality for the user
+    Tinder style book recommendation
+    """
+    initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
+    binder_markup = InlineKeyboardMarkup(row_width=3)
+    binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like'))
+    binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave'))
+    binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike'))
+    await bot.send_photo(message.from_user.id,get_book_cover(initial_recommendation.book_id))
+    await bot.send_message(message.from_user.id,text=initial_recommendation.title,reply_markup=binder_markup)
 
 
+@dp.callback_query_handler(lambda c: c.data.split(',')[1] in ['binder_dislike'])
+async def process_callback_binder_like(callback_query: types.CallbackQuery):
+    """
+    Processing dislike button
+    Adding into not interestion and deleting from recommendation
+    """
+    
 
+    add_into_not_interested(
+        callback_query.data.split(',')[0],
+        get_user_id(callback_query.from_user.username)
+    )
+    delete_from_recommendation(
+        callback_query.data.split(',')[0],
+        get_user_id(callback_query.from_user.username)
+    )
+    await process_binder(callback_query.from_user.message)
 
+@dp.callback_query_handler(lambda c: c.data.split(',')[1] in ['binder_like'])
+async def process_callback_binder_like(callback_query: types.CallbackQuery):
+    """
+    Processing like button
+    """
+    add_into_to_read(
+        callback_query.data.split(',')[0],
+        get_user_id(callback_query.from_user.username)
+    )
+    await process_binder(message=message.from_user.message)
 
 
 if __name__ == '__main__':
