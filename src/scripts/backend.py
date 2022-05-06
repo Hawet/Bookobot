@@ -107,7 +107,7 @@ def get_book_cover(book_id):
     img = Image.open(requests.get(url, stream=True).raw)
     # saving image to buffer
     buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
+    img.convert('RGB').save(buffer, format="PNG")
 
     #img.show()
     return buffer.getbuffer()
