@@ -5,7 +5,7 @@ import sqlalchemy
 engine = sqlalchemy.create_engine('postgresql://postgres:123@localhost/books')
 
 
-def recommend(user_id):
+def recommend(user_id, num_books=10):
     rec_df = pd.read_sql(
         'select '+
         'title, '+
@@ -43,7 +43,7 @@ def recommend(user_id):
             'from ratings '+
             f'where user_id = {user_id}) '+
         'order by r.rating desc '+
-        'limit 10'
+        f'limit {num_books}'
          ,engine)
     return rec_df
 
@@ -58,15 +58,29 @@ def recommend_single_book(user_id):
     else:
         return rec.iloc[0]
 
-def construct_recommendation_table():
-    users = pd.read_sql('select user_id from users', engine)['user_id'].tolist()
-    res_df = pd.DataFrame(columns=['user_id', 'book_id'])
-    for user in users:
-        print('constructing recommendation for user: ', user)
-        rec_df = recommend(user)
-        rec_df['user_id'] = user
-        res_df = res_df.append(rec_df)
-    res_df.to_sql('recommendations', engine, if_exists='replace', index=False)
+def construct_recommendation_table(user_id=None):
+    """
+    This function constructs recommendation table for given user
+    or if user not provided, for all users
+    """
+    if user_id is None:
+        users = pd.read_sql('select user_id from users', engine)['user_id'].tolist()
+        res_df = pd.DataFrame(columns=['user_id', 'book_id'])
+        for user in users:
+            print('constructing recommendation for user: ', user)
+            rec_df = recommend(user)
+            rec_df['user_id'] = user
+            res_df = res_df.append(rec_df)
+        res_df.to_sql('recommendations', engine, if_exists='replace', index=False)
+    else:
+        users = pd.read_sql(f'select user_id from users where user_id={user_id}', engine)['user_id'].tolist()
+        res_df = pd.DataFrame(columns=['user_id', 'book_id'])
+        for user in users:
+            print('constructing recommendation for user: ', user)
+            rec_df = recommend(user,100)
+            rec_df['user_id'] = user
+            res_df = res_df.append(rec_df)
+        res_df.to_sql('recommendations', engine, if_exists='append', index=False)
 
 def delete_from_recommendation(book_id,user_id):
     engine.execute(
@@ -80,5 +94,5 @@ if __name__=='__main__':
     # testing deletion and recommendation
     #print(recommend_single_book(100065))
     #delete_from_recommendation(100065,890)
-    #print(recommend_single_book(100065))
-    print(construct_recommendation_table())
+    print(recommend_single_book(100065))
+    #print(construct_recommendation_table())

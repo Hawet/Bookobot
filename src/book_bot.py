@@ -1,7 +1,7 @@
 from email import message
 import logging
 import json
-from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation
+from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation, construct_recommendation_table
 from recommendation.binder_states import BinderStates
 from numpy import add, tile
 from TOKEN import TOKEN
@@ -111,6 +111,11 @@ async def process_binder(message: types.Message):
     Tinder style book recommendation
     """
     BinderStates.main_menu.set()
+    initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
+    # Constructing recommendation table for given user if no recommendations found
+    if initial_recommendation is None:
+        await bot.send_message(message.from_user.id, 'No recommendations found!'+'\n'+'construncting initial recommendation table...')
+        construct_recommendation_table(get_user_id(message.from_user.username))
     initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
     binder_markup = InlineKeyboardMarkup(row_width=3)
     binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(message.from_user.id)))
