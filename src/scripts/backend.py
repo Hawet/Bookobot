@@ -1,4 +1,3 @@
-import imp
 import sqlalchemy
 from sqlalchemy.exc import IntegrityError
 engine = sqlalchemy.create_engine('postgresql://postgres:123@localhost/books')
@@ -113,5 +112,23 @@ def get_book_cover(book_id):
     return buffer.getbuffer()
 
 
+def get_book_author(book_id) -> str:
+    """
+    Function returns book author by book_id
+    """
+    return pd.read_sql(f'select authors from public.books where book_id = {book_id}',engine).iloc[0,0]
+
+
+def get_book_desc(bokk_id) -> str:
+    """
+    Function returns book description by book_id
+    """
+    return pd.read_sql(f'select descr from public.books where book_id = {bokk_id}',engine).iloc[0,0]
+
+
+
+
+
 if __name__ == '__main__':
     print(get_book_cover(890))
+    print(get_book_desc(890))

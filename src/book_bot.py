@@ -122,8 +122,12 @@ async def process_binder(message: types.Message):
     binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(message.from_user.id)))
     binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike,'+str(message.from_user.id)))
     await bot.send_photo(message.from_user.id,get_book_cover(initial_recommendation.book_id))
-    await bot.send_message(message.from_user.id,text=initial_recommendation.title,reply_markup=binder_markup)
-
+    await bot.send_message(message.from_user.id,text=initial_recommendation.title)
+    # send book desc if present
+    if get_book_desc(initial_recommendation.book_id) is not None:
+        await bot.send_message(message.from_user.id,get_book_desc(initial_recommendation.book_id))
+    await bot.send_message(message.from_user.id,text=get_book_author(initial_recommendation.book_id),reply_markup=binder_markup)
+    
 
 @dp.callback_query_handler(lambda c: c.data.split(',')[1] in ['binder_dislike'])
 async def process_callback_binder_like(callback_query: types.CallbackQuery):
@@ -151,9 +155,13 @@ async def process_callback_binder_like(callback_query: types.CallbackQuery):
     binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike,'+str(target_user_id)))
-    await bot.send_photo(target_chat_id,get_book_cover(initial_recommendation.book_id))
-    await bot.send_message(target_chat_id,text=initial_recommendation.title,reply_markup=binder_markup)
-
+    await bot.send_photo(callback_query.from_user.id,get_book_cover(initial_recommendation.book_id))
+    await bot.send_message(callback_query.from_user.id,text=initial_recommendation.title)
+    # send book desc if present
+    if get_book_desc(initial_recommendation.book_id) is not None:
+        await bot.send_message(callback_query.from_user.id,get_book_desc(initial_recommendation.book_id))
+    await bot.send_message(callback_query.from_user.id,text=get_book_author(initial_recommendation.book_id),reply_markup=binder_markup)
+    
 
 
 @dp.callback_query_handler(lambda c: c.data.split(',')[1] in ['binder_like'])
@@ -180,9 +188,13 @@ async def process_callback_binder_like(callback_query: types.CallbackQuery):
     binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike,'+str(target_user_id)))
-    await bot.send_photo(target_chat_id,get_book_cover(initial_recommendation.book_id))
-    await bot.send_message(target_chat_id,text=initial_recommendation.title,reply_markup=binder_markup)
-
+    await bot.send_photo(callback_query.from_user.id,get_book_cover(initial_recommendation.book_id))
+    await bot.send_message(callback_query.from_user.id,text=initial_recommendation.title)
+    # send book desc if present
+    if get_book_desc(initial_recommendation.book_id) is not None:
+        await bot.send_message(callback_query.from_user.id,get_book_desc(initial_recommendation.book_id))
+    await bot.send_message(callback_query.from_user.id,text=get_book_author(initial_recommendation.book_id),reply_markup=binder_markup)
+    
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
