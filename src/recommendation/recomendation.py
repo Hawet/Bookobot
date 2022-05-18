@@ -97,5 +97,5 @@ if __name__=='__main__':
     # testing deletion and recommendation
     #print(recommend_single_book(100065))
     #delete_from_recommendation(100065,890)
-    print(recommend_single_book(100085))
+    print(recommend_single_book(100065))
     #print(construct_recommendation_table())

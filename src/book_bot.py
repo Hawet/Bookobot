@@ -1,7 +1,8 @@
 from email import message
 import logging
 import json
-from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation, construct_recommendation_table
+from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation
+from recommendation.collaborative_filtering_utills import construct_recommendation_table
 from recommendation.binder_states import BinderStates
 from numpy import add, tile
 from TOKEN import TOKEN
