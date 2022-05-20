@@ -1,7 +1,7 @@
 from email import message
 import logging
 import json
-from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation
+from recommendation.recomendation import recommend, recommend_single_book, delete_from_recommendation, rated_books_exist
 from recommendation.collaborative_filtering_utills import construct_recommendation_table
 from recommendation.binder_states import BinderStates
 from numpy import add, tile
@@ -112,23 +112,25 @@ async def process_binder(message: types.Message):
     Tinder style book recommendation
     """
     BinderStates.main_menu.set()
-    initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
-    # Constructing recommendation table for given user if no recommendations found
-    if initial_recommendation is None:
-        await bot.send_message(message.from_user.id, 'No recommendations found!'+'\n'+'construncting initial recommendation table...')
-        construct_recommendation_table(get_user_id(message.from_user.username))
-    initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
-    binder_markup = InlineKeyboardMarkup(row_width=3)
-    binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(message.from_user.id)))
-    binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(message.from_user.id)))
-    binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike,'+str(message.from_user.id)))
-    await bot.send_photo(message.from_user.id,get_book_cover(initial_recommendation.book_id))
-    await bot.send_message(message.from_user.id,text=initial_recommendation.title)
-    # send book desc if present
-    if get_book_desc(initial_recommendation.book_id) is not None:
-        await bot.send_message(message.from_user.id,get_book_desc(initial_recommendation.book_id))
-    await bot.send_message(message.from_user.id,text=get_book_author(initial_recommendation.book_id),reply_markup=binder_markup)
-    
+    if rated_books_exist(get_user_id(message.from_user.username)):
+        initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
+        # Constructing recommendation table for given user if no recommendations found
+        if initial_recommendation is None:
+            await bot.send_message(message.from_user.id, 'No recommendations found!'+'\n'+'construncting initial recommendation table...')
+            construct_recommendation_table(get_user_id(message.from_user.username))
+        initial_recommendation = recommend_single_book(get_user_id(message.from_user.username))
+        binder_markup = InlineKeyboardMarkup(row_width=3)
+        binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(message.from_user.id)))
+        binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(message.from_user.id)))
+        binder_markup.insert(InlineKeyboardButton(u"\u274C",callback_data=str(initial_recommendation.book_id)+',binder_dislike,'+str(message.from_user.id)))
+        await bot.send_photo(message.from_user.id,get_book_cover(initial_recommendation.book_id))
+        await bot.send_message(message.from_user.id,text=initial_recommendation.title)
+        # send book desc if present
+        if get_book_desc(initial_recommendation.book_id) is not None:
+            await bot.send_message(message.from_user.id,get_book_desc(initial_recommendation.book_id))
+        await bot.send_message(message.from_user.id,text=get_book_author(initial_recommendation.book_id),reply_markup=binder_markup)
+    else:
+        await bot.send_message(message.from_user.id, "You do not have any rated books, please use /add command to add books that you like")    
 
 @dp.callback_query_handler(lambda c: c.data.split(',')[1] in ['binder_dislike'])
 async def process_callback_binder_like(callback_query: types.CallbackQuery):
@@ -152,6 +154,9 @@ async def process_callback_binder_like(callback_query: types.CallbackQuery):
     
     print(target_user_id)
     initial_recommendation = recommend_single_book(target_user_id)
+    if initial_recommendation is None:
+            await bot.send_message(message.from_user.id, 'No recommendations found!'+'\n'+'construncting initial recommendation table...')
+            construct_recommendation_table(get_user_id(message.from_user.username))
     binder_markup = InlineKeyboardMarkup(row_width=3)
     binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(target_user_id)))
@@ -185,6 +190,9 @@ async def process_callback_binder_like(callback_query: types.CallbackQuery):
     
     print(target_user_id)
     initial_recommendation = recommend_single_book(target_user_id)
+    if initial_recommendation is None:
+            await bot.send_message(message.from_user.id, 'No recommendations found!'+'\n'+'construncting initial recommendation table...')
+            construct_recommendation_table(get_user_id(message.from_user.username))
     binder_markup = InlineKeyboardMarkup(row_width=3)
     binder_markup.insert(InlineKeyboardButton(u"\u2764\ufe0f",callback_data=str(initial_recommendation.book_id)+',binder_like,'+str(target_user_id)))
     binder_markup.insert(InlineKeyboardButton(u"\U0001F3F3",callback_data=str(initial_recommendation.book_id)+',binder_leave,'+str(target_user_id)))

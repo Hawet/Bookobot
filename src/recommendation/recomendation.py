@@ -1,4 +1,5 @@
 import re
+from xmlrpc.client import Boolean
 import pandas as pd
 import sqlalchemy
 
@@ -90,6 +91,17 @@ def delete_from_recommendation(book_id,user_id):
         f'delete from recommendations where user_id = {user_id} and book_id = {book_id}; commit;'
     )
     print(f'deleted {book_id} from {user_id}')
+
+
+def rated_books_exist(user_id:int) -> Boolean:
+    """
+    this function checks if given user rated any books
+    """
+    books = pd.read_sql(f'select book_id from ratings where user_id = {user_id}',engine)
+    if books.empty:
+        return False
+    else:
+        return True
 
 
 if __name__=='__main__':

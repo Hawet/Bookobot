@@ -57,7 +57,7 @@ def get_recommendation_collabarative(user_id,book_corr,book_rating):
     for i in range(len(book_titles)):
         if (book_titles[i] not in books_list 
             and book_titles[i] not in not_interested_list
-            and similar_books[i] > -0.1): # here we have arbitrary threshold for similarity (can be tweaked)
+            and similar_books[i] > 0): # here we have arbitrary threshold for similarity (can be tweaked)
             print('current_title',book_titles[i])
             try:
                 """
