@@ -26,10 +26,6 @@ def prepare_corr_dataset():
     )
     book_rating = pd.pivot_table(merged_data, index='user_id', values='rating', columns='title', fill_value=0)
     book_rating.to_sql('book_rating',engine,if_exists='replace')
-    book_corr = np.corrcoef(book_rating.T)
-    df = pd.DataFrame(book_corr)
-    #df.to_sql('corr_matrix',engine,if_exists='replace')
-
 
 
 def get_recommendation_collabarative(user_id,book_corr,book_rating):
@@ -57,7 +53,7 @@ def get_recommendation_collabarative(user_id,book_corr,book_rating):
     for i in range(len(book_titles)):
         if (book_titles[i] not in books_list 
             and book_titles[i] not in not_interested_list
-            and similar_books[i] > 0): # here we have arbitrary threshold for similarity (can be tweaked)
+            and similar_books[i] > -0.2): # here we have arbitrary threshold for similarity (can be tweaked)
             print('current_title',book_titles[i])
             try:
                 """
@@ -104,4 +100,4 @@ def construct_recommendation_table(user_id=None):
 
 if __name__=='__main__':
     construct_recommendation_table()
-    
+    #prepare_corr_dataset()
