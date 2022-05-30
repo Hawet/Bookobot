@@ -22,18 +22,19 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
-  run:
-    name: rerun bot on server
+  Rerun:
+    needs: deploy
     runs-on: ubuntu-latest
-
+    
     steps:
-      -name: run
-      -uses: actions/checkout@v2
-      env:
+      - uses: actions/checkout@v2 
+      - name: Deploy in EC2
+        env:
             PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY  }}
-            HOSTNAME : ${{ secrets.HOSTDNS  }}
+            HOSTNAME : ${{ secrets.HOST_DNS  }}
             USER_NAME : ${{ secrets.USERNAME  }}
-      run: |
+            
+        run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             cd /home/ubuntu/bookobot &&
