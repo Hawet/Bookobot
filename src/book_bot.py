@@ -1,3 +1,5 @@
+import sys,os
+sys.path.append(os.getcwd())
 from email import message
 import logging
 import json
