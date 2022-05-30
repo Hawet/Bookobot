@@ -1,5 +1,8 @@
-import sys,os
-sys.path.append(os.getcwd())
+import os
+
+from os.path import abspath, dirname
+os.chdir(dirname(abspath(__file__)))
+
 from email import message
 import logging
 import json
