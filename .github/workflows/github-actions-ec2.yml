@@ -24,7 +24,7 @@ jobs:
           TARGET: ${{ secrets.TARGET_DIR }}
   Rerun:
     needs: deploy
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v2 
@@ -37,7 +37,6 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-            AWS_EC2_METADATA_DISABLED=true;
             cd /home/ubuntu/bookobot/src ;
             pkill -f book_bot.py ;
             nohup python3 book_bot.py >& /dev/null &'
