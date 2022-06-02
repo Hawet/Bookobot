@@ -56,7 +56,7 @@ jobs:
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             cd /home/ubuntu/bookobot/src &&
-            nohup python3 book_bot.py >& /dev/null & ;
+            nohup python3 book_bot.py >& /dev/null &
             exit 0'
    
 
