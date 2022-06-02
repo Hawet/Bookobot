@@ -40,6 +40,5 @@ jobs:
             AWS_EC2_METADATA_DISABLED=true;
             cd /home/ubuntu/bookobot/src ;
             pkill -f book_bot.py ;
-            sleep 3;
             nohup python3 book_bot.py >& /dev/null &'
 
