@@ -104,7 +104,8 @@ async def process_help(message: types.Message):
     '/start - start bot \n'+
     '/add - add book \n'+
     '/get_recommendation - get recommendation \n'+
-    '/help - show this help'
+    '/help - show this help\n'+
+    'This bot has been restartded'
     )
 
 
