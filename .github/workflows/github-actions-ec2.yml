@@ -22,7 +22,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
-  Rerun:
+  Kill_existing_instance:
     needs: deploy
     runs-on: ubuntu-latest
     
@@ -39,6 +39,24 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             cd /home/ubuntu/bookobot/src &&
             echo 'I was here, Github' > text.txt &&
-            pkill -f book_bot.py &&
+            pkill -f book_bot.py &&'
+            
+  Start_new_instance:
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Deploy in EC2
+        env:
+            PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY  }}
+            HOSTNAME : ${{ secrets.HOST_DNS  }}
+            USER_NAME : ${{ secrets.USERNAME  }}
+            
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+            cd /home/ubuntu/bookobot/src &&
             nohup python3 book_bot.py >& /dev/null &'
+   
 
