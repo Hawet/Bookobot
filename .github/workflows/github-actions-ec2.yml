@@ -38,11 +38,10 @@ jobs:
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             cd /home/ubuntu/bookobot/src &&
-            echo 'I was here, Github' > text.txt &&
             pkill -f book_bot.py &&'
             
   Start_new_instance:
-    needs: deploy
+    needs: Kill_existing_instance
     runs-on: ubuntu-latest
     
     steps:
