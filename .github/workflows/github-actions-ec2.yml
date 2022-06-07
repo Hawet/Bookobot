@@ -57,6 +57,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' screen -d -m
             cd /home/ubuntu/bookobot/src &&
             nohup python3 book_bot.py > nohup.out 2> nohup.err < /dev/null & disown
-            '
+            ' & disown
    
 
